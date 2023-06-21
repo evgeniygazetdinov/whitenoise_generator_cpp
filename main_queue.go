@@ -8,7 +8,7 @@ import (
     )
 
     func getLinksForDownload() string {
-        contents,_ := ioutil.ReadFile("plikTekstowy.txt")
+        contents,_ := ioutil.ReadFile("examples.txt")
         return string(contents);
     }
 
@@ -18,21 +18,26 @@ import (
         })
         return arr
     }
+    func prepareUrls(links []string)*list.List{
+        queue := list.New()
+        for _, link := range links {
+            queue.PushBack(link)
+          }
+        // fmt.Println(reflect.TypeOf(queue))
+        return queue
+    }
+    func getDataForQueue()*list.List{
+       arrayWithUrl := makeArrayWithLinks(getLinksForDownload())
+       queue := prepareUrls(arrayWithUrl) 
+       return queue 
+    }
 
 func main() {
-    // new linked list
+    myQueue := getDataForQueue()
+    fmt.Println("%q",myQueue)
 
-    fmt.Println("%q\n",makeArrayWithLinks(getLinksForDownload()));
-    queue := list.New()
-
-    queue.PushBack(10)
-    queue.PushBack(20)
-    queue.PushBack(30)
-    front:=queue.Front()
-    fmt.Println(front.Value)
-    queue.Remove(front)
-    //TODO 1) push all links into queue
-    //2)make one thread for download
+    // TODO 
+    //1)make one thread for download
     //3)zipping each into archive
     //return list with link
  
