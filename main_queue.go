@@ -3,8 +3,12 @@ import (
     "io/ioutil";
     "fmt";
     "container/list";
-    "strings"
+    "strings";
     // "reflect";
+    // "sync";
+    "math/rand"
+    "log";
+    "net/http";
     )
 
     func getLinksForDownload() string {
@@ -32,6 +36,40 @@ import (
        return queue 
     }
 
+    func awaitTask(myValue string) <-chan string {
+        fmt.Println(myValue)
+        fmt.Println("Starting Task...")
+    
+        c := make(chan string)
+    
+        go func() {
+            resp, err := http.Get("https://pokeapi.co/api/v2/pokemon/ditto")
+            if err != nil {
+                log.Fatalln(err)
+            }
+    
+            body, err := ioutil.ReadAll(resp.Body)
+            if err != nil {
+                log.Fatalln(err)
+            }
+    
+            c <- string(body)
+    
+            fmt.Println("...Done!")
+        }()
+    
+        return c
+    }
+    const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func RandStringBytes(n int) string {
+    b := make([]byte, n)
+    for i := range b {
+        b[i] = letterBytes[rand.Intn(len(letterBytes))]
+    }
+    return string(b)
+}
+
 func main() {
     myQueue := getDataForQueue()
     fmt.Println("%q",myQueue)
@@ -40,5 +78,13 @@ func main() {
     //1)make one thread for download
     //3)zipping each into archive
     //return list with link
- 
+    
+    // put leng of que here
+    for i:=0;i<10;i++{
+        myRandomString := RandStringBytes(i)
+        value := <-awaitTask(myRandomString)
+
+        fmt.Println(value)
+    }
+
 }
