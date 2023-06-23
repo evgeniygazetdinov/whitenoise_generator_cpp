@@ -4,11 +4,10 @@ import (
     "fmt";
     "container/list";
     "strings";
-    // "reflect";
-    // "sync";
     "math/rand"
     "log";
     "net/http";
+    "reflect"
     )
 
     func getLinksForDownload() string {
@@ -27,7 +26,6 @@ import (
         for _, link := range links {
             queue.PushBack(link)
           }
-        // fmt.Println(reflect.TypeOf(queue))
         return queue
     }
     func getDataForQueue()*list.List{
@@ -36,14 +34,14 @@ import (
        return queue 
     }
 
-    func awaitTask(myValue string) <-chan string {
+    func awaitTask(myValue string, myUrl string) <-chan string {
         fmt.Println(myValue)
         fmt.Println("Starting Task...")
     
         c := make(chan string)
     
         go func() {
-            resp, err := http.Get("https://pokeapi.co/api/v2/pokemon/ditto")
+            resp, err := http.Get(myUrl)
             if err != nil {
                 log.Fatalln(err)
             }
@@ -60,9 +58,18 @@ import (
     
         return c
     }
-    const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+func getMethods(myQueue *list.List){
+    fooType := reflect.TypeOf(myQueue)
+    for i := 0; i < fooType.NumMethod(); i++ {
+        method := fooType.Method(i)
+        fmt.Println(method.Name)
+
+    }
+}
+    
 func RandStringBytes(n int) string {
+    const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     b := make([]byte, n)
     for i := range b {
         b[i] = letterBytes[rand.Intn(len(letterBytes))]
@@ -70,21 +77,44 @@ func RandStringBytes(n int) string {
     return string(b)
 }
 
+// func downloadMultipleFiles(urls []string) ([][]byte, error) {
+// 	done := make(chan []byte, len(urls))
+// 	errch := make(chan error, len(urls))
+// 	for _, URL := range urls {
+// 		go func(URL string) {
+// 			b, err := downloadFile(URL)
+// 			if err != nil {
+// 				errch <- err
+// 				done <- nil
+// 				return
+// 			}
+// 			done <- b
+// 			errch <- nil
+// 		}(URL)
+// 	}
+// 	bytesArray := make([][]byte, 0)
+// 	var errStr string
+// 	for i := 0; i < len(urls); i++ {
+// 		bytesArray = append(bytesArray, <-done)
+// 		if err := <-errch; err != nil {
+// 			errStr = errStr + " " + err.Error()
+// 		}
+// 	}
+// 	var err error
+// 	if errStr!=""{
+// 		err = errors.New(errStr)
+// 	}
+// 	return bytesArray, err
+// }
+
 func main() {
     myQueue := getDataForQueue()
-    fmt.Println("%q",myQueue)
 
-    // TODO 
-    //1)make one thread for download
-    //3)zipping each into archive
-    //return list with link
-    
-    // put leng of que here
-    for i:=0;i<10;i++{
+    getMethods(myQueue)
+    for i:=0;i<myQueue.Len();i++{
         myRandomString := RandStringBytes(i)
-        value := <-awaitTask(myRandomString)
-
-        fmt.Println(value)
+            value := <-awaitTask(myRandomString, myQueue.Front())
+            myQueue.Remove()
+            fmt.Println(value)
+          }
     }
-
-}
