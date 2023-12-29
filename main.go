@@ -1,49 +1,32 @@
 package main
 
 import (
+	"database/sql"
+
 	"fmt"
-	"html/template"
-	"net/http"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-const PORT = ":8080"
+func dbConnect() {
 
-type User struct {
-	Name                string
-	Age                 uint16
-	Money               int16
-	AvgGrades, Happines float64
-	Hobbies             []string
-}
+	db, err := sql.Open("mysql", "root:my-secret-pw@/tcp(127.0.0.1:3306)/golang")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	fmt.Println("CONNECT TO DB")
 
-func (u User) getAllInfo() string {
-	return fmt.Sprintf("User name is: %s He is %d and he"+
-		"has money: %d", u.Name, u.Age, u.Money)
-}
+	insert, err := db.Query("INSERT into  users (name, age) values('колек', 24)")
+	if err != nil {
+		panic(err)
+	}
+	defer insert.Close()
 
-func (u *User) setNewName(newName string) {
-	u.Name = newName
-}
-
-func homePage(page http.ResponseWriter, r *http.Request) {
-	bob := User{"boh", 25, -50, 3.0, 5.0, []string{"football", "dancer"}}
-	bob.setNewName("Alex")
-	// fmt.Fprintf(page, bob.getAllInfo())
-	tmpl, _ := template.ParseFiles("templates/home_page.html")
-	tmpl.Execute(page, bob)
-}
-
-func contactsPage(page http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(page, "contacts page")
-}
-
-func handleRequest() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/contacts/", contactsPage)
-	fmt.Printf("Running on %s \n", PORT)
-	http.ListenAndServe(PORT, nil)
 }
 
 func main() {
-	handleRequest()
+
+	dbConnect()
+
 }
