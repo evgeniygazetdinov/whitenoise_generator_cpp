@@ -1,10 +1,12 @@
 <h1> for first up mysql container</h1>
-docker run  --name some-mysql3 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql
+docker-compose -f docker-compose.yml build
+<h1> for next attempts</h1>
+docker-compose -f docker-compose.yml up -d db
 
 
 
 dbeaver string connection
-jdbc:mysql://localhost:3306/mysql?allowPublicKeyRetrieval=true&useSSL=false
+jdbc:mysql://localhost:3306/golang?allowPublicKeyRetrieval=true&useSSL=false
 
 
 
@@ -15,6 +17,3 @@ CREATE TABLE users (
 	name varchar(100) NULL,
 	age INT NULL
 )
-ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_0900_ai_ci;

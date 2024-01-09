@@ -10,14 +10,14 @@ import (
 
 func dbConnect() {
 
-	db, err := sql.Open("mysql", "root:my-secret-pw@/tcp(127.0.0.1:3306)/golang")
+	db, err := sql.Open("mysql", "docker:password@tcp(0.0.0.0:3306)/golang")
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 	fmt.Println("CONNECT TO DB")
 
-	insert, err := db.Query("INSERT into  users (name, age) values('колек', 24)")
+	insert, err := db.Query("INSERT into  users (name, age) values('kolek', 24)")
 	if err != nil {
 		panic(err)
 	}

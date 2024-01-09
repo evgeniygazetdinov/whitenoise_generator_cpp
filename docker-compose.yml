@@ -1,0 +1,10 @@
+db:
+  image: mysql:5.7.26
+  container_name: godockerDB
+  environment:
+    MYSQL_USER: docker
+    MYSQL_ROOT_PASSWORD: password
+    MYSQL_PASSWORD: password
+    MYSQL_DATABASE: golang
+  ports:
+    - "3306:3306"
