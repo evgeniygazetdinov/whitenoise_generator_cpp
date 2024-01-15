@@ -8,7 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const PORT = ":8080"
+// const PORT = ":8080"
 
 type User struct {
 	Name                string
@@ -42,7 +42,7 @@ func contactsPage(page http.ResponseWriter, r *http.Request) {
 func handleRequest() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/contacts/", contactsPage)
-	fmt.Printf("Running on %s \n", PORT)
+
 	http.ListenAndServe(PORT, nil)
 }
 

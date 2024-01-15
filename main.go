@@ -3,53 +3,62 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"html/template"
+	"log"
+	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type User struct {
-	Name string `json: "name"`
-	Age  uint16 `json: "age"`
+const PORT = ":8080"
+
+type ViewData struct {
+	Title   string
+	Message string
 }
 
-func insertUserIntoDb(db *sql.DB) {
-	insert, err := db.Query("INSERT into  users (name, age) values('kolek', 24)")
-	defer insert.Close()
-	if err != nil {
-		panic(err)
-	}
+var database *sql.DB
+
+type Products struct {
+	Id      int
+	Model   string
+	Company string
+	Price   int
 }
 
-func printAllUsersInsideDb(db *sql.DB) {
+func handleFunc() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-	res, err := db.Query("select name, age from `users`")
-	if err != nil {
-		panic(err)
-	}
-
-	for res.Next() {
-		var user User
-		err = res.Scan(&user.Name, &user.Age)
+		rows, err := database.Query("select * from products")
 		if err != nil {
-			panic(err)
+			fmt.Println("error")
 		}
-		fmt.Println(fmt.Sprintf("User name: %s age: %d", user.Name, user.Age))
-	}
+		defer rows.Close()
+		products := []Products{}
+		for rows.Next() {
+			p := Products{}
+			err := rows.Scan(&p.Id, &p.Model, &p.Company, &p.Price)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			products = append(products, p)
+		}
+
+		tmpl, _ := template.ParseFiles("templates/index.html")
+		tmpl.Execute(w, products)
+	})
+	fmt.Printf("Running on %s \n", PORT)
+	http.ListenAndServe(PORT, nil)
+
 }
-
-func dbConnect() *sql.DB {
-
-	db, err := sql.Open("mysql", "docker:password@tcp(0.0.0.0:3306)/golang")
-	if err != nil {
-		panic(err)
-	}
-	// defer db.Close()
-	return db
-}
-
 func main() {
+	db, err := sql.Open("mysql", "docker:password@tcp(0.0.0.0:3306)/golang")
 
-	db := dbConnect()
-	insertUserIntoDb(db)
-	printAllUsersInsideDb(db)
+	if err != nil {
+		log.Println(err)
+	}
+	database = db
+	defer db.Close()
+	handleFunc()
 }
