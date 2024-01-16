@@ -12,11 +12,6 @@ import (
 
 const PORT = ":8080"
 
-type ViewData struct {
-	Title   string
-	Message string
-}
-
 var database *sql.DB
 
 type Products struct {
@@ -26,32 +21,55 @@ type Products struct {
 	Price   int
 }
 
-func handleFunc() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+type ViewData struct {
+	Title   string
+	Message string
+}
 
-		rows, err := database.Query("select * from products")
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+
+	rows, err := database.Query("select * from products")
+	if err != nil {
+		fmt.Println("error")
+	}
+	defer rows.Close()
+	products := []Products{}
+	for rows.Next() {
+		p := Products{}
+		err := rows.Scan(&p.Id, &p.Model, &p.Company, &p.Price)
 		if err != nil {
-			fmt.Println("error")
+			fmt.Println(err)
+			continue
 		}
-		defer rows.Close()
-		products := []Products{}
-		for rows.Next() {
-			p := Products{}
-			err := rows.Scan(&p.Id, &p.Model, &p.Company, &p.Price)
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			products = append(products, p)
-		}
+		products = append(products, p)
+	}
 
-		tmpl, _ := template.ParseFiles("templates/index.html")
-		tmpl.Execute(w, products)
-	})
-	fmt.Printf("Running on %s \n", PORT)
-	http.ListenAndServe(PORT, nil)
+	tmpl, _ := template.ParseFiles("templates/index.html")
+	tmpl.Execute(w, products)
 
 }
+
+func addProduct(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			log.Println(err)
+		}
+		model := r.FormValue("model")
+		company := r.FormValue("company")
+		price := r.FormValue("price")
+
+		_, err = database.Exec("insert into golang.products(model, company, price) values (?, ?,?)", model, company, price)
+
+		if err != nil {
+			log.Println(err)
+		}
+		http.Redirect(w, r, "/", 301)
+	} else {
+		http.ServeFile(w, r, "templates/create.html")
+	}
+}
+
 func main() {
 	db, err := sql.Open("mysql", "docker:password@tcp(0.0.0.0:3306)/golang")
 
@@ -60,5 +78,8 @@ func main() {
 	}
 	database = db
 	defer db.Close()
-	handleFunc()
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/create", addProduct)
+	fmt.Printf("Running on %s \n", PORT)
+	http.ListenAndServe(PORT, nil)
 }
