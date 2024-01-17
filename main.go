@@ -7,10 +7,12 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const PORT = ":8080"
+const PORT = ":8081"
 
 var database *sql.DB
 
@@ -70,6 +72,41 @@ func addProduct(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func editPage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	prod := Products{}
+	row := database.QueryRow("select * from golang.products where id = ?", id)
+	err := row.Scan(&prod.Id, &prod.Model, &prod.Company, &prod.Price)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(404), http.StatusNotFound)
+	} else {
+		tmpl, _ := template.ParseFiles("templates/edit.html")
+		tmpl.Execute(w, prod)
+	}
+}
+
+func editHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			log.Println(err)
+		}
+		id := r.FormValue("id")
+		model := r.FormValue("model")
+		company := r.FormValue("company")
+		price := r.FormValue("price")
+
+		_, err = database.Exec("update golang.products set model = ?, company = ?, price = ? where id = ?", model, company, price, id)
+
+		if err != nil {
+			log.Println(err)
+		}
+		http.Redirect(w, r, "/", 301)
+	}
+}
+
 func main() {
 	db, err := sql.Open("mysql", "docker:password@tcp(0.0.0.0:3306)/golang")
 
@@ -78,8 +115,14 @@ func main() {
 	}
 	database = db
 	defer db.Close()
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/create", addProduct)
+	router := mux.NewRouter()
+	router.HandleFunc("/", indexHandler)
+	router.HandleFunc("/create", addProduct)
+	router.HandleFunc("/edit/{id:[0-9]+}", editPage).Methods("GET")
+	router.HandleFunc("/edit/{id:[0-9]+}", editHandler).Methods("POST")
+
+	http.Handle("/", router)
+
 	fmt.Printf("Running on %s \n", PORT)
 	http.ListenAndServe(PORT, nil)
 }
