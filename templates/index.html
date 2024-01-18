@@ -16,7 +16,8 @@
                 <td>{{.Model}}</td>
                 <td>{{.Company}}</td>
                 <td>{{.Price}}</td>
-                <td><a href="/edit/{{.Id}}">Изменить</a>
+                <td><a href="/edit/{{.Id}}">Изменить</a> |
+                    <a href="/delete/{{.Id}}">Удалить</a>
             </tr>
             {{end}}
         </table>

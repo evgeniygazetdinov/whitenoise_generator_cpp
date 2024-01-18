@@ -35,3 +35,18 @@ insert into products (model, company, price)
 values ('iPhone X', 'Apple', 74000),
 ('Pixel 2', 'Google', 62000),
 ('Galaxy S9', 'Samsung', 65000)
+
+<br>
+===================================
+<br>
+roadmap
+<br>
+1.complete crud [v]
+<br>
+2.replace to separated modeles etc mvt []
+<br>
+3.connect async []
+<br>
+4.finish frontend stuff(connect bootstrap, sorting columns, total)
+<br>
+5.add features for store/buy/products maybe additional design database

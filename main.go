@@ -28,9 +28,21 @@ type ViewData struct {
 	Message string
 }
 
+func DeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	_, err := database.Exec("delete from golang.products where id = ?", id)
+	if err != nil {
+		log.Println(err)
+	}
+
+	http.Redirect(w, r, "/", 301)
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 
-	rows, err := database.Query("select * from products")
+	rows, err := database.Query("select * from golang.products")
 	if err != nil {
 		fmt.Println("error")
 	}
@@ -120,6 +132,7 @@ func main() {
 	router.HandleFunc("/create", addProduct)
 	router.HandleFunc("/edit/{id:[0-9]+}", editPage).Methods("GET")
 	router.HandleFunc("/edit/{id:[0-9]+}", editHandler).Methods("POST")
+	router.HandleFunc("/delete/{id:[0-9]+}", DeleteHandler)
 
 	http.Handle("/", router)
 
