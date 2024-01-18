@@ -35,3 +35,14 @@ insert into products (model, company, price)
 values ('iPhone X', 'Apple', 74000),
 ('Pixel 2', 'Google', 62000),
 ('Galaxy S9', 'Samsung', 65000)
+
+<br>
+===================================
+<br>
+roadmap
+<br>
+1.complete crud [v]
+<br>
+2.replace to separated modeles etc mvt []
+<br>
+3.connect async []
