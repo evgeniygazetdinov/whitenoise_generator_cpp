@@ -50,3 +50,5 @@ roadmap
 4.finish frontend stuff(connect bootstrap, sorting columns, total)
 <br>
 5.add features for store/buy/products maybe additional design database
+<br>
+6.think about server for serving project
