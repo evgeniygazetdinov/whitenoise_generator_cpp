@@ -9,7 +9,7 @@ import (
 func CreateFile() {
 	if os.Args[1] == "startapp" && len(os.Args) > 2 && os.Args[2] != "" {
 		packageName := os.Args[2]
-		os.MkdirAll(packageName, os.ModeDir)
+		os.MkdirAll(packageName, os.ModePerm)
 		currDir, err := os.Getwd()
 		fmt.Println(currDir)
 
@@ -42,6 +42,11 @@ func CreateFile() {
 			if err != nil {
 				log.Fatal(err)
 			}
+		
+			// You can also write it to a file as a whole.
+			err = os.WriteFile(x[i], "package "+ packageName, 0644)
+			if err != nil {
+				log.Fatal(err)
 			defer f.Close()
 		}
 	}
