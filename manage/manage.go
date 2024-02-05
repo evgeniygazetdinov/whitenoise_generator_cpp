@@ -8,6 +8,7 @@ import (
 
 func CreateFile() {
 	if os.Args[1] == "startapp" && len(os.Args) > 2 && os.Args[2] != "" {
+
 		packageName := os.Args[2]
 		os.MkdirAll(packageName, os.ModePerm)
 		currDir, err := os.Getwd()
@@ -33,7 +34,7 @@ func CreateFile() {
 		currDir, err = os.Getwd()
 
 		fmt.Println(currDir)
-
+		myPackage := []byte("package " + packageName)
 		x := []string{"handlers.go", "models.go", "views.go"}
 		for i := 0; i < len(x); i++ {
 			fmt.Printf("%x ", x[i])
@@ -42,13 +43,13 @@ func CreateFile() {
 			if err != nil {
 				log.Fatal(err)
 			}
-		
-			// You can also write it to a file as a whole.
-			err = os.WriteFile(x[i], "package "+ packageName, 0644)
+
+			err = os.WriteFile(x[i], myPackage, 0644)
 			if err != nil {
 				log.Fatal(err)
-			defer f.Close()
+				defer f.Close()
+			}
 		}
-	}
 
+	}
 }
