@@ -1,7 +1,7 @@
 package main
 
 import (
-	app "work_in_que/app"
+	"app"
 )
 
 func main() {
