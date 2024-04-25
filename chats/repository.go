@@ -66,7 +66,7 @@ func (c *Repository) Get(email string, carID string) (Car, error) {
 	return result, nil
 }
 
-func (c *Repository) Save(car Car) error {
+func (c *Repository) Save(car ListCarQuery) error {
 	_, err := c.db.Collection(c.collectionName).InsertOne(context.TODO(), car)
 	if err != nil {
 		return err

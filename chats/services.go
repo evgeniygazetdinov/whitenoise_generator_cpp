@@ -4,9 +4,7 @@ import (
 	"context"
 	"work_in_que/logging"
 	"work_in_que/user"
-
 	// "fmt"
-	"time"
 	// "common"
 	// "github.com/google/uuid"
 )
@@ -43,13 +41,10 @@ func (c *Services) GetByID(ctx context.Context, session user.Session, carID stri
 
 func (c *Services) Create(ctx context.Context, session user.Session, body CreateCar) error {
 	ctx = context.WithValue(ctx, logging.CtxServiceMethod, "Create")
-	car := Car{
-		Make:    body.Make,
-		Model:   body.Model,
-		Year:    body.Year,
-		Status:  "",
-		Created: time.Now(),
-		Email:   session.Email,
+	car := ListCarQuery{
+		Make:  body.Make,
+		Model: body.Model,
+		Year:  body.Year,
 	}
 	err := c.chatsRepository.Save(car)
 	if err != nil {
