@@ -31,26 +31,6 @@ g++ -o whitenoise main.cpp -lportaudio -std=c++17
 - `q` : выход
 
 
-## Возможные проблемы
-
-1. **Ошибка компиляции с PortAudio:**
-   ```
-   fatal error: portaudio.h: No such file or directory
-   ```
-   Решение: Установите заголовочные файлы PortAudio (см. раздел "Установка зависимостей")
-
-2. **Ошибка линковки с PortAudio:**
-   ```
-   undefined reference to `Pa_Initialize'
-   ```
-   Решение: Убедитесь, что библиотека PortAudio установлена и флаг `-lportaudio` указан при компиляции
-
-3. **Ошибка при запуске:**
-   ```
-   PortAudio error: Unanticipated host error
-   ```
-   Решение: Проверьте, что звуковая система работает и у вас есть права на использование аудиоустройств
-
 ## Лицензия
 
 MIT
